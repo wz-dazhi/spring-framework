@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:tag="http://www.dazhi.com/schema/dazhi/spring-dazhi"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.dazhi.com/schema/dazhi/spring-dazhi
+	   https://cdn.jsdelivr.net/gh/wz-dazhi/pic@master/blog/spring/2021/07/06171640spring-dazhi.xsd">
+
+	<tag:da-zhi id="daZhiTag" name="zhangsan" age="18" email="11111@qq.com"/>
+
+</beans>

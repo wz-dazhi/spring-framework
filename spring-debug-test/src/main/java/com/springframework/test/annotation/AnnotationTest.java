@@ -1,4 +1,4 @@
-package com.springframework.test;
+package com.springframework.test.annotation;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -16,7 +16,7 @@ import org.springframework.core.env.Environment;
 public class Test {
 
 	public static void main(String[] args) {
-		ApplicationContext c = new AnnotationConfigApplicationContext();
+		ApplicationContext c = new AnnotationConfigApplicationContext("com.springframework.test.annotation");
 		final Environment e = c.getEnvironment();
 		System.out.println(e.getProperty("user.home"));
 	}

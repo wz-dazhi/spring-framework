@@ -13,7 +13,7 @@ import org.springframework.core.env.Environment;
  * @date: 2021/7/4
  * @version: 1.0
  */
-public class Test {
+public class AnnotationTest {
 
 	public static void main(String[] args) {
 		ApplicationContext c = new AnnotationConfigApplicationContext("com.springframework.test.annotation");

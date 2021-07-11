@@ -1,0 +1,4 @@
+user:
+  class: com.springframework.test.yaml.User
+  username: Tom
+  password: 123456

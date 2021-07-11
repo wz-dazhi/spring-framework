@@ -1,0 +1,10 @@
+[
+  {
+    "class": "com.springframework.test.json.User",
+    "parent": null,
+    "abstract": false,
+    "lazy-init": false,
+    "name": "大治",
+    "age": 23
+  }
+]

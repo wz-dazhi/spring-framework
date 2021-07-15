@@ -6,6 +6,7 @@ group 'org.springframework'
 version '5.2.16.BUILD-SNAPSHOT'
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 

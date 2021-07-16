@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="person" class="com.springframework.test.xml.factorymethod.StaticFactoryMethod" factory-method="getPerson"/>
+
+	<bean id="dynamicFactoryMethod" class="com.springframework.test.xml.factorymethod.DynamicFactoryMethod"/>
+	<bean id="person2" class="com.springframework.test.xml.factorymethod.Person" factory-bean="dynamicFactoryMethod"
+		  factory-method="getPerson"/>
+</beans>

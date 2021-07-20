@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="user" class="com.springframework.test.xml.customeditor.User">
+		<property name="name" value="zhangsan"/>
+		<property name="address" value="北京,北京市,西城区"/>
+	</bean>
+	<!-- 第一种方式: 直接注册编辑器 -->
+	<!--	<bean class="com.springframework.test.xml.customeditor.AddressEditorRegistrar"/>-->
+
+	<!-- 第二种方式: 注册spring提供的BeanFactoryPostProcessor -->
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<!-- 1. 设置注册器 -->
+		<!--		<property name="propertyEditorRegistrars">-->
+		<!--			<list>-->
+		<!--				<bean class="com.springframework.test.xml.customeditor.AddressEditorRegistrar"/>-->
+		<!--			</list>-->
+		<!--		</property>-->
+		<!-- 2. 直接添加编辑器 -->
+		<property name="customEditors">
+			<map>
+				<entry key="com.springframework.test.xml.customeditor.Address"
+					   value="com.springframework.test.xml.customeditor.AddressEditor"/>
+			</map>
+		</property>
+	</bean>
+</beans>

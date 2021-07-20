@@ -16,14 +16,8 @@
 
 package org.springframework.beans.factory.xml;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -31,6 +25,11 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Default implementation of the {@link NamespaceHandlerResolver} interface.
@@ -115,24 +114,33 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 	@Override
 	@Nullable
 	public NamespaceHandler resolve(String namespaceUri) {
+		// 获取映射map
 		Map<String, Object> handlerMappings = getHandlerMappings();
+		// 根据namespace获取对应的handler, value: 第一次是字符串, 通过else解析成对应的handler对象
 		Object handlerOrClassName = handlerMappings.get(namespaceUri);
 		if (handlerOrClassName == null) {
 			return null;
 		}
 		else if (handlerOrClassName instanceof NamespaceHandler) {
+			// 属于handler对象, 直接返回
 			return (NamespaceHandler) handlerOrClassName;
 		}
 		else {
+			// 获取对应handler的class名称
 			String className = (String) handlerOrClassName;
 			try {
+				// 反射获取对应的handler类
 				Class<?> handlerClass = ClassUtils.forName(className, this.classLoader);
+				// 不属于NamespaceHandler子类抛出异常
 				if (!NamespaceHandler.class.isAssignableFrom(handlerClass)) {
 					throw new FatalBeanException("Class [" + className + "] for namespace [" + namespaceUri +
 							"] does not implement the [" + NamespaceHandler.class.getName() + "] interface");
 				}
+				// 反射获取handler的实现类
 				NamespaceHandler namespaceHandler = (NamespaceHandler) BeanUtils.instantiateClass(handlerClass);
+				// init加载对应的标签解析类
 				namespaceHandler.init();
+				// 放入缓存, 方便下次获取
 				handlerMappings.put(namespaceUri, namespaceHandler);
 				return namespaceHandler;
 			}

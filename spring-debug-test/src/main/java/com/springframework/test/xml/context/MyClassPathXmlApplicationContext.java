@@ -1,11 +1,15 @@
 package com.springframework.test.xml.context;
 
+import com.springframework.test.xml.beanfactorypostprocessor.MyBeanDefinitionRegistryPostProcessor;
+import com.springframework.test.xml.beanfactorypostprocessor.MyBeanFactoryPostProcessor;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
 
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -32,4 +36,12 @@ public class MyClassPathXmlApplicationContext extends ClassPathXmlApplicationCon
 		sources.addLast(new PropertiesPropertySource("customProperties", p));
 		return e;
 	}
+
+	@Override
+	public List<BeanFactoryPostProcessor> getBeanFactoryPostProcessors() {
+		super.addBeanFactoryPostProcessor(new MyBeanFactoryPostProcessor());
+		super.addBeanFactoryPostProcessor(new MyBeanDefinitionRegistryPostProcessor());
+		return super.getBeanFactoryPostProcessors();
+	}
+
 }

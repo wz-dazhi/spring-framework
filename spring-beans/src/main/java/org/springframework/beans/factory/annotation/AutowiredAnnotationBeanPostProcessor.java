@@ -643,7 +643,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 		@Override
 		protected void inject(Object bean, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable {
-			// 字段注入
+			// 字段注入 @Autowired @Value
 			Field field = (Field) this.member;
 			Object value;
 			// 从缓存中获取

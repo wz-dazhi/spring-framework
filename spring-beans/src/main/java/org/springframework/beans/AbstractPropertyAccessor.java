@@ -16,12 +16,12 @@
 
 package org.springframework.beans;
 
+import org.springframework.lang.Nullable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.lang.Nullable;
 
 /**
  * Abstract implementation of the {@link PropertyAccessor} interface.
@@ -96,6 +96,7 @@ public abstract class AbstractPropertyAccessor extends TypeConverterSupport impl
 			this.suppressNotWritablePropertyException = true;
 		}
 		try {
+			// 遍历属性赋值
 			for (PropertyValue pv : propertyValues) {
 				// setPropertyValue may throw any BeansException, which won't be caught
 				// here, if there is a critical failure such as no matching field.

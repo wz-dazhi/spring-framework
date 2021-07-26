@@ -1275,7 +1275,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			// 获取建议值
 			Object value = getAutowireCandidateResolver().getSuggestedValue(descriptor);
 			if (value != null) {
+				// @Value
 				if (value instanceof String) {
+					// 解析 ${}
 					String strVal = resolveEmbeddedValue((String) value);
 					BeanDefinition bd = (beanName != null && containsBean(beanName) ?
 							getMergedBeanDefinition(beanName) : null);

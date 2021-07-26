@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="woman" class="com.springframework.test.xml.methodoverride.Woman" scope="prototype"/>
+	<bean id="man" class="com.springframework.test.xml.methodoverride.Man">
+		<!-- lookup-method 每次获取的对象都是最新的 -->
+		<lookup-method name="getWoman" bean="woman"/>
+		<!--		<property name="woman" ref="woman"/>-->
+	</bean>
+
+</beans>

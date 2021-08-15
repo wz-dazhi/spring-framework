@@ -16,11 +16,6 @@
 
 package org.springframework.aop.framework;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.Arrays;
-
 import org.springframework.aop.SpringProxy;
 import org.springframework.aop.TargetClassAware;
 import org.springframework.aop.TargetSource;
@@ -30,6 +25,11 @@ import org.springframework.core.DecoratingProxy;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Arrays;
 
 /**
  * Utility methods for AOP proxy factories.
@@ -116,17 +116,22 @@ public abstract class AopProxyUtils {
 	 * @see DecoratingProxy
 	 */
 	static Class<?>[] completeProxiedInterfaces(AdvisedSupport advised, boolean decoratingProxy) {
+		// 获取代理接口
 		Class<?>[] specifiedInterfaces = advised.getProxiedInterfaces();
 		if (specifiedInterfaces.length == 0) {
 			// No user-specified interfaces: check whether target class is an interface.
+			// 没有指定接口,  检查目标类是否属于一个接口
 			Class<?> targetClass = advised.getTargetClass();
 			if (targetClass != null) {
+				// 属于接口, 添加到advised中
 				if (targetClass.isInterface()) {
 					advised.setInterfaces(targetClass);
 				}
+				// 属于Proxy子类, 添加代理目标实现的接口
 				else if (Proxy.isProxyClass(targetClass)) {
 					advised.setInterfaces(targetClass.getInterfaces());
 				}
+				// 赋值
 				specifiedInterfaces = advised.getProxiedInterfaces();
 			}
 		}
@@ -146,10 +151,12 @@ public abstract class AopProxyUtils {
 		Class<?>[] proxiedInterfaces = new Class<?>[specifiedInterfaces.length + nonUserIfcCount];
 		System.arraycopy(specifiedInterfaces, 0, proxiedInterfaces, 0, specifiedInterfaces.length);
 		int index = specifiedInterfaces.length;
+		// 添加SpringProxy接口
 		if (addSpringProxy) {
 			proxiedInterfaces[index] = SpringProxy.class;
 			index++;
 		}
+		// 添加Advised接口
 		if (addAdvised) {
 			proxiedInterfaces[index] = Advised.class;
 			index++;

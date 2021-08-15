@@ -16,15 +16,6 @@
 
 package org.springframework.aop.support;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.springframework.aop.Advisor;
 import org.springframework.aop.AopInvocationException;
 import org.springframework.aop.IntroductionAdvisor;
@@ -40,6 +31,15 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Utility methods for AOP support code.
@@ -227,6 +227,7 @@ public abstract class AopUtils {
 			return false;
 		}
 
+		// 获取方法匹配对象
 		MethodMatcher methodMatcher = pc.getMethodMatcher();
 		if (methodMatcher == MethodMatcher.TRUE) {
 			// No need to iterate the methods if we're matching any method anyway...
@@ -239,14 +240,18 @@ public abstract class AopUtils {
 		}
 
 		Set<Class<?>> classes = new LinkedHashSet<>();
+		// 目标class不属于Proxy的子类, 将目标class加入到集合中
 		if (!Proxy.isProxyClass(targetClass)) {
 			classes.add(ClassUtils.getUserClass(targetClass));
 		}
+		// 添加目标类所有的接口
 		classes.addAll(ClassUtils.getAllInterfacesForClassAsSet(targetClass));
 
+		// 循环遍历所有的class, 判断目标class的所有方法, 是否能够与pointcut expression匹配到
 		for (Class<?> clazz : classes) {
 			Method[] methods = ReflectionUtils.getAllDeclaredMethods(clazz);
 			for (Method method : methods) {
+				// 匹配到一个method 就返回true, 因为后期动态代理执行的时候还会进行一次精确匹配
 				if (introductionAwareMethodMatcher != null ?
 						introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions) :
 						methodMatcher.matches(method, targetClass)) {
@@ -281,15 +286,18 @@ public abstract class AopUtils {
 	 * @return whether the pointcut can apply on any method
 	 */
 	public static boolean canApply(Advisor advisor, Class<?> targetClass, boolean hasIntroductions) {
+		// IntroductionAdvisor分支匹配到Class上
 		if (advisor instanceof IntroductionAdvisor) {
 			return ((IntroductionAdvisor) advisor).getClassFilter().matches(targetClass);
 		}
+		// PointcutAdvisor属于匹配到Method上
 		else if (advisor instanceof PointcutAdvisor) {
 			PointcutAdvisor pca = (PointcutAdvisor) advisor;
 			return canApply(pca.getPointcut(), targetClass, hasIntroductions);
 		}
 		else {
 			// It doesn't have a pointcut so we assume it applies.
+			// 没有切入点, 假设可以使用
 			return true;
 		}
 	}
@@ -307,13 +315,17 @@ public abstract class AopUtils {
 			return candidateAdvisors;
 		}
 		List<Advisor> eligibleAdvisors = new ArrayList<>();
+		// 遍历候选者Advisor, 并且属于IntroductionAdvisor分支的; IntroductionAdvisor通知属于附加的接口实现, 不属于目标class实现的接口
 		for (Advisor candidate : candidateAdvisors) {
 			if (candidate instanceof IntroductionAdvisor && canApply(candidate, clazz)) {
 				eligibleAdvisors.add(candidate);
 			}
 		}
+		// 是否存在IntroductionAdvisor
 		boolean hasIntroductions = !eligibleAdvisors.isEmpty();
+		// 遍历候选者, 处理其他Advisor
 		for (Advisor candidate : candidateAdvisors) {
+			// 上面处理过了, 跳过
 			if (candidate instanceof IntroductionAdvisor) {
 				// already processed
 				continue;

@@ -16,6 +16,8 @@
 
 package org.springframework.util;
 
+import org.springframework.lang.Nullable;
+
 import java.beans.Introspector;
 import java.io.Closeable;
 import java.io.Externalizable;
@@ -39,8 +41,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
-
-import org.springframework.lang.Nullable;
 
 /**
  * Miscellaneous {@code java.lang.Class} utility methods.
@@ -750,11 +750,13 @@ public abstract class ClassUtils {
 	 */
 	public static Set<Class<?>> getAllInterfacesForClassAsSet(Class<?> clazz, @Nullable ClassLoader classLoader) {
 		Assert.notNull(clazz, "Class must not be null");
+		// 本身就是接口, 返回
 		if (clazz.isInterface() && isVisible(clazz, classLoader)) {
 			return Collections.singleton(clazz);
 		}
 		Set<Class<?>> interfaces = new LinkedHashSet<>();
 		Class<?> current = clazz;
+		// 循环遍历, 获取clazz实现的所有接口
 		while (current != null) {
 			Class<?>[] ifcs = current.getInterfaces();
 			for (Class<?> ifc : ifcs) {
@@ -894,6 +896,7 @@ public abstract class ClassUtils {
 	 * @return the user-defined class
 	 */
 	public static Class<?> getUserClass(Class<?> clazz) {
+		// 返回用户定义的class, 如果clazz属于cglic生成的class, 则返回clazz的父类
 		if (clazz.getName().contains(CGLIB_CLASS_SEPARATOR)) {
 			Class<?> superclass = clazz.getSuperclass();
 			if (superclass != null && superclass != Object.class) {

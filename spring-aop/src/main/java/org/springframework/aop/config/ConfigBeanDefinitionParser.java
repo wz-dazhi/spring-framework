@@ -342,7 +342,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 			String aspectName, int order, Element aspectElement, Element adviceElement, ParserContext parserContext,
 			List<BeanDefinition> beanDefinitions, List<BeanReference> beanReferences) {
 
-		// 嵌套关系: advisor -> advice -> factory, method
+		// 嵌套关系: advisor -> advice -> MethodLocatingFactoryBean, SimpleBeanFactoryAwareAspectInstanceFactory, AspectJExpressionPointcut
 		try {
 			this.parseState.push(new AdviceEntry(parserContext.getDelegate().getLocalName(adviceElement)));
 

@@ -96,6 +96,7 @@ public class SpringObjenesis implements Objenesis {
 	 * @throws ObjenesisException if instance creation failed
 	 */
 	public <T> T newInstance(Class<T> clazz, boolean useCache) {
+		// 不使用缓存
 		if (!useCache) {
 			return newInstantiatorOf(clazz).newInstance();
 		}
@@ -108,6 +109,7 @@ public class SpringObjenesis implements Objenesis {
 
 	@SuppressWarnings("unchecked")
 	public <T> ObjectInstantiator<T> getInstantiatorOf(Class<T> clazz) {
+		// 从缓存中获取实例化器
 		ObjectInstantiator<?> instantiator = this.cache.get(clazz);
 		if (instantiator == null) {
 			ObjectInstantiator<T> newInstantiator = newInstantiatorOf(clazz);

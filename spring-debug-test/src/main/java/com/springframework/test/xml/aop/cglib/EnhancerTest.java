@@ -1,4 +1,4 @@
-package com.springframework.test.xml.aop;
+package com.springframework.test.xml.aop.cglib;
 
 import org.springframework.cglib.proxy.Callback;
 import org.springframework.cglib.proxy.Enhancer;
@@ -29,7 +29,7 @@ public class EnhancerTest {
 
 		final EnhancerFactory<UserService> factory = new EnhancerFactory<>(UserService.class);
 		final UserService userService = factory.getObject();
-		userService.show();
+		userService.show("");
 	}
 
 	private static class EnhancerFactory<T> {

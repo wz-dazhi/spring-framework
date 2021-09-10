@@ -16,21 +16,10 @@
 
 package org.springframework.context.event;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.UndeclaredThrowableException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CompletionStage;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-
 import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
@@ -49,6 +38,16 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.concurrent.ListenableFuture;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CompletionStage;
 
 /**
  * {@link GenericApplicationListener} adapter that delegates the processing of
@@ -97,6 +96,7 @@ public class ApplicationListenerMethodAdapter implements GenericApplicationListe
 
 	public ApplicationListenerMethodAdapter(String beanName, Class<?> targetClass, Method method) {
 		this.beanName = beanName;
+		// 返回原始方法(如果属于桥接方法)
 		this.method = BridgeMethodResolver.findBridgedMethod(method);
 		this.targetMethod = (!Proxy.isProxyClass(targetClass) ?
 				AopUtils.getMostSpecificMethod(method, targetClass) : this.method);
@@ -150,6 +150,7 @@ public class ApplicationListenerMethodAdapter implements GenericApplicationListe
 
 	@Override
 	public void onApplicationEvent(ApplicationEvent event) {
+		// 处理事件
 		processEvent(event);
 	}
 
@@ -187,6 +188,7 @@ public class ApplicationListenerMethodAdapter implements GenericApplicationListe
 	public void processEvent(ApplicationEvent event) {
 		Object[] args = resolveArguments(event);
 		if (shouldHandle(event, args)) {
+			// 调用
 			Object result = doInvoke(args);
 			if (result != null) {
 				handleResult(result);
@@ -294,6 +296,7 @@ public class ApplicationListenerMethodAdapter implements GenericApplicationListe
 	 */
 	@Nullable
 	protected Object doInvoke(Object... args) {
+		// 获取目标bean
 		Object bean = getTargetBean();
 		// Detect package-protected NullBean instance through equals(null) check
 		if (bean.equals(null)) {
@@ -302,6 +305,9 @@ public class ApplicationListenerMethodAdapter implements GenericApplicationListe
 
 		ReflectionUtils.makeAccessible(this.method);
 		try {
+			// method反射调用具体的Listener方法
+			// 当前bean属于代理对象(一般情况下加了@Async需要进行异步执行), 则调用DynamicAdvisedInterceptor的intercept方法; 获取执行器链, 具体处理监听的类为AsyncExecutionInterceptor
+			// 当前bean不属于代理对象, 直接反射调用
 			return this.method.invoke(bean, args);
 		}
 		catch (IllegalArgumentException ex) {

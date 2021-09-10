@@ -48,7 +48,9 @@ public class AspectJPointcutAdvisor implements PointcutAdvisor, Ordered {
 	 */
 	public AspectJPointcutAdvisor(AbstractAspectJAdvice advice) {
 		Assert.notNull(advice, "Advice must not be null");
+		// 赋值advice
 		this.advice = advice;
+		// 构建安全的pointcut
 		this.pointcut = advice.buildSafePointcut();
 	}
 

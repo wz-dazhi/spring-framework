@@ -16,13 +16,13 @@
 
 package org.springframework.scheduling.annotation;
 
-import java.lang.reflect.Method;
-import java.util.concurrent.Executor;
-
 import org.springframework.aop.interceptor.AsyncExecutionInterceptor;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.lang.Nullable;
+
+import java.lang.reflect.Method;
+import java.util.concurrent.Executor;
 
 /**
  * Specialization of {@link AsyncExecutionInterceptor} that delegates method execution to
@@ -80,10 +80,13 @@ public class AnnotationAsyncExecutionInterceptor extends AsyncExecutionIntercept
 	protected String getExecutorQualifier(Method method) {
 		// Maintainer's note: changes made here should also be made in
 		// AnnotationAsyncExecutionAspect#getExecutorQualifier
+		// 获取方法上的Async注解
 		Async async = AnnotatedElementUtils.findMergedAnnotation(method, Async.class);
 		if (async == null) {
+			// 方法上获取不到, 从方法所在的Class类上获取
 			async = AnnotatedElementUtils.findMergedAnnotation(method.getDeclaringClass(), Async.class);
 		}
+		// 返回执行器的名称
 		return (async != null ? async.value() : null);
 	}
 

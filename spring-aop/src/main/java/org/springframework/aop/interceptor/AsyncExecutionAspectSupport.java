@@ -16,19 +16,8 @@
 
 package org.springframework.aop.interceptor;
 
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
-import java.util.function.Supplier;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -43,6 +32,16 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.function.SingletonSupplier;
+
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Future;
+import java.util.function.Supplier;
 
 /**
  * Base class for asynchronous method execution aspects, such as
@@ -161,19 +160,24 @@ public abstract class AsyncExecutionAspectSupport implements BeanFactoryAware {
 	 */
 	@Nullable
 	protected AsyncTaskExecutor determineAsyncExecutor(Method method) {
+		// 从缓存中获取异步执行器
 		AsyncTaskExecutor executor = this.executors.get(method);
 		if (executor == null) {
 			Executor targetExecutor;
+			// 返回执行器的名称
 			String qualifier = getExecutorQualifier(method);
+			// 执行器名称不为空, 从beanFactory中获取执行器bean
 			if (StringUtils.hasLength(qualifier)) {
 				targetExecutor = findQualifiedExecutor(this.beanFactory, qualifier);
 			}
+			// 执行器名称为空, 获取默认的执行器
 			else {
 				targetExecutor = this.defaultExecutor.get();
 			}
 			if (targetExecutor == null) {
 				return null;
 			}
+			// 执行器加入缓存
 			executor = (targetExecutor instanceof AsyncListenableTaskExecutor ?
 					(AsyncListenableTaskExecutor) targetExecutor : new TaskExecutorAdapter(targetExecutor));
 			this.executors.put(method, executor);
@@ -287,6 +291,7 @@ public abstract class AsyncExecutionAspectSupport implements BeanFactoryAware {
 			return executor.submit(task);
 		}
 		else {
+			// 提交任务
 			executor.submit(task);
 			return null;
 		}

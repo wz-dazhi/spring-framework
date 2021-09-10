@@ -403,17 +403,22 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 		RootBeanDefinition adviceDefinition = new RootBeanDefinition(getAdviceClass(adviceElement, parserContext));
 		adviceDefinition.setSource(parserContext.extractSource(adviceElement));
 
+		// aspectName
 		adviceDefinition.getPropertyValues().add(ASPECT_NAME_PROPERTY, aspectName);
+		// order 排序
 		adviceDefinition.getPropertyValues().add(DECLARATION_ORDER_PROPERTY, order);
 
+		// returning
 		if (adviceElement.hasAttribute(RETURNING)) {
 			adviceDefinition.getPropertyValues().add(
 					RETURNING_PROPERTY, adviceElement.getAttribute(RETURNING));
 		}
+		// throwing
 		if (adviceElement.hasAttribute(THROWING)) {
 			adviceDefinition.getPropertyValues().add(
 					THROWING_PROPERTY, adviceElement.getAttribute(THROWING));
 		}
+		// arg-names
 		if (adviceElement.hasAttribute(ARG_NAMES)) {
 			adviceDefinition.getPropertyValues().add(
 					ARG_NAMES_PROPERTY, adviceElement.getAttribute(ARG_NAMES));

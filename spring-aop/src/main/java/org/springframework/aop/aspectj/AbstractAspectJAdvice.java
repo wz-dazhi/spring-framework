@@ -16,22 +16,12 @@
 
 package org.springframework.aop.aspectj;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInvocation;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.weaver.tools.JoinPointMatch;
 import org.aspectj.weaver.tools.PointcutParameter;
-
 import org.springframework.aop.AopInvocationException;
 import org.springframework.aop.MethodMatcher;
 import org.springframework.aop.Pointcut;
@@ -48,6 +38,15 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Base class for AOP Alliance {@link org.aopalliance.aop.Advice} classes
@@ -187,6 +186,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	 * Return the AspectJ expression pointcut.
 	 */
 	public final AspectJExpressionPointcut getPointcut() {
+		// 计算参数绑定
 		calculateArgumentBindings();
 		return this.pointcut;
 	}
@@ -197,7 +197,9 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	 * @see #getPointcut()
 	 */
 	public final Pointcut buildSafePointcut() {
+		// 获取切入点
 		Pointcut pc = getPointcut();
+		// 方法匹配器
 		MethodMatcher safeMethodMatcher = MethodMatchers.intersection(
 				new AdviceExcludingMethodMatcher(this.aspectJAdviceMethod), pc.getMethodMatcher());
 		return new ComposablePointcut(pc.getClassFilter(), safeMethodMatcher);
@@ -383,15 +385,21 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 			return;
 		}
 
+		// 绑定参数数量
 		int numUnboundArgs = this.parameterTypes.length;
+		// 获取通知方法的参数数组
 		Class<?>[] parameterTypes = this.aspectJAdviceMethod.getParameterTypes();
+		// 第一个参数: 可能绑定了JoinPoint, 可能绑定了ProceedingJoinPoint, 可能绑定了JoinPoint.StaticPart
 		if (maybeBindJoinPoint(parameterTypes[0]) || maybeBindProceedingJoinPoint(parameterTypes[0]) ||
 				maybeBindJoinPointStaticPart(parameterTypes[0])) {
+			// 绑定数量--
 			numUnboundArgs--;
 		}
 
+		// 如果绑定数量还大于0
 		if (numUnboundArgs > 0) {
 			// need to bind arguments by name as returned from the pointcut match
+			// 从切入点匹配的名称进行参数绑定
 			bindArgumentsByName(numUnboundArgs);
 		}
 
@@ -410,6 +418,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 
 	private boolean maybeBindProceedingJoinPoint(Class<?> candidateParameterType) {
 		if (ProceedingJoinPoint.class == candidateParameterType) {
+			// 不支持绑定ProceedingJoinPoint 抛出异常, 目前只有Around支持
 			if (!supportsProceedingJoinPoint()) {
 				throw new IllegalArgumentException("ProceedingJoinPoint is only supported for around advice");
 			}
@@ -439,6 +448,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 		if (this.argumentNames == null) {
 			this.argumentNames = createParameterNameDiscoverer().getParameterNames(this.aspectJAdviceMethod);
 		}
+		// 确定参数个数, 进行绑定
 		if (this.argumentNames != null) {
 			// We have been able to determine the arg names.
 			bindExplicitArguments(numArgumentsExpectingToBind);
@@ -567,15 +577,18 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 		Object[] adviceInvocationArgs = new Object[this.parameterTypes.length];
 		int numBound = 0;
 
+		// 设置JointPoint
 		if (this.joinPointArgumentIndex != -1) {
 			adviceInvocationArgs[this.joinPointArgumentIndex] = jp;
 			numBound++;
 		}
+		// 设置JointPointStaticPart
 		else if (this.joinPointStaticPartArgumentIndex != -1) {
 			adviceInvocationArgs[this.joinPointStaticPartArgumentIndex] = jp.getStaticPart();
 			numBound++;
 		}
 
+		// 参数绑定不为空, 遍历匹配参数名称进行绑定
 		if (!CollectionUtils.isEmpty(this.argumentBindings)) {
 			// binding from pointcut match
 			if (jpMatch != null) {
@@ -623,6 +636,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 			@Nullable JoinPointMatch jpMatch, @Nullable Object returnValue, @Nullable Throwable ex)
 			throws Throwable {
 
+		// 给一个绑定参数执行通知方法
 		return invokeAdviceMethodWithGivenArgs(argBinding(getJoinPoint(), jpMatch, returnValue, ex));
 	}
 
@@ -630,6 +644,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	protected Object invokeAdviceMethod(JoinPoint jp, @Nullable JoinPointMatch jpMatch,
 			@Nullable Object returnValue, @Nullable Throwable t) throws Throwable {
 
+		// 给一个绑定参数执行通知方法
 		return invokeAdviceMethodWithGivenArgs(argBinding(jp, jpMatch, returnValue, t));
 	}
 

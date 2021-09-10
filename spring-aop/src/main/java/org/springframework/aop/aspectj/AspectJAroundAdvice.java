@@ -16,15 +16,14 @@
 
 package org.springframework.aop.aspectj;
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.weaver.tools.JoinPointMatch;
-
 import org.springframework.aop.ProxyMethodInvocation;
+
+import java.io.Serializable;
+import java.lang.reflect.Method;
 
 /**
  * Spring AOP around advice (MethodInterceptor) that wraps
@@ -67,6 +66,7 @@ public class AspectJAroundAdvice extends AbstractAspectJAdvice implements Method
 		ProxyMethodInvocation pmi = (ProxyMethodInvocation) mi;
 		ProceedingJoinPoint pjp = lazyGetProceedingJoinPoint(pmi);
 		JoinPointMatch jpm = getJoinPointMatch(pmi);
+		// 调用Around方法
 		return invokeAdviceMethod(pjp, jpm, null, null);
 	}
 

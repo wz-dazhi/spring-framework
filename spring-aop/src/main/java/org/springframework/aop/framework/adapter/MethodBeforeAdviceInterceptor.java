@@ -16,14 +16,13 @@
 
 package org.springframework.aop.framework.adapter;
 
-import java.io.Serializable;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-
 import org.springframework.aop.BeforeAdvice;
 import org.springframework.aop.MethodBeforeAdvice;
 import org.springframework.util.Assert;
+
+import java.io.Serializable;
 
 /**
  * Interceptor to wrap a {@link MethodBeforeAdvice}.
@@ -52,7 +51,9 @@ public class MethodBeforeAdviceInterceptor implements MethodInterceptor, BeforeA
 
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
+		// 调用通知before方法
 		this.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis());
+		// 回到链的开始
 		return mi.proceed();
 	}
 

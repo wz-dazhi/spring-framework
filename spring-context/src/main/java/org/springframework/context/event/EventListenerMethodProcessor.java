@@ -16,17 +16,8 @@
 
 package org.springframework.context.event;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.aop.framework.autoproxy.AutoProxyUtils;
 import org.springframework.aop.scope.ScopedObject;
 import org.springframework.aop.scope.ScopedProxyUtils;
@@ -49,6 +40,14 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Registers {@link EventListener} methods as individual {@link ApplicationListener} instances.
  * Implements {@link BeanFactoryPostProcessor} (as of 5.1) primarily for early retrieval,
@@ -56,9 +55,9 @@ import org.springframework.util.CollectionUtils;
  *
  * @author Stephane Nicoll
  * @author Juergen Hoeller
- * @since 4.2
  * @see EventListenerFactory
  * @see DefaultEventListenerFactory
+ * @since 4.2
  */
 public class EventListenerMethodProcessor
 		implements SmartInitializingSingleton, ApplicationContextAware, BeanFactoryPostProcessor {
@@ -71,11 +70,17 @@ public class EventListenerMethodProcessor
 	@Nullable
 	private ConfigurableListableBeanFactory beanFactory;
 
+	/**
+	 * 事件监听工厂
+	 */
 	@Nullable
 	private List<EventListenerFactory> eventListenerFactories;
 
 	private final EventExpressionEvaluator evaluator = new EventExpressionEvaluator();
 
+	/**
+	 * 不存在@EventListener注解的Class
+	 */
 	private final Set<Class<?>> nonAnnotatedClasses = Collections.newSetFromMap(new ConcurrentHashMap<>(64));
 
 
@@ -90,8 +95,10 @@ public class EventListenerMethodProcessor
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 
+		// 获取EventListenerFactory类型的bean, 用于赋值给EventListener工厂集合
 		Map<String, EventListenerFactory> beans = beanFactory.getBeansOfType(EventListenerFactory.class, false, false);
 		List<EventListenerFactory> factories = new ArrayList<>(beans.values());
+		// 排序赋值
 		AnnotationAwareOrderComparator.sort(factories);
 		this.eventListenerFactories = factories;
 	}
@@ -106,15 +113,16 @@ public class EventListenerMethodProcessor
 			if (!ScopedProxyUtils.isScopedTarget(beanName)) {
 				Class<?> type = null;
 				try {
+					// 获取bean的原始类型
 					type = AutoProxyUtils.determineTargetClass(beanFactory, beanName);
-				}
-				catch (Throwable ex) {
+				} catch (Throwable ex) {
 					// An unresolvable bean type, probably from a lazy bean - let's ignore it.
 					if (logger.isDebugEnabled()) {
 						logger.debug("Could not resolve target class for bean with name '" + beanName + "'", ex);
 					}
 				}
 				if (type != null) {
+					// 如果属于作用域的代理对象, 则取目标Class对象
 					if (ScopedObject.class.isAssignableFrom(type)) {
 						try {
 							Class<?> targetClass = AutoProxyUtils.determineTargetClass(
@@ -122,8 +130,7 @@ public class EventListenerMethodProcessor
 							if (targetClass != null) {
 								type = targetClass;
 							}
-						}
-						catch (Throwable ex) {
+						} catch (Throwable ex) {
 							// An invalid scoped proxy arrangement - let's ignore it.
 							if (logger.isDebugEnabled()) {
 								logger.debug("Could not resolve target bean for scoped proxy '" + beanName + "'", ex);
@@ -131,9 +138,9 @@ public class EventListenerMethodProcessor
 						}
 					}
 					try {
+						// 处理
 						processBean(beanName, type);
-					}
-					catch (Throwable ex) {
+					} catch (Throwable ex) {
 						throw new BeanInitializationException("Failed to process @EventListener " +
 								"annotation on bean with name '" + beanName + "'", ex);
 					}
@@ -143,39 +150,45 @@ public class EventListenerMethodProcessor
 	}
 
 	private void processBean(final String beanName, final Class<?> targetType) {
+		// 集合中不包含当前Class, 并且不属于spring容器的Class
 		if (!this.nonAnnotatedClasses.contains(targetType) &&
 				AnnotationUtils.isCandidateClass(targetType, EventListener.class) &&
 				!isSpringContainerClass(targetType)) {
 
 			Map<Method, EventListener> annotatedMethods = null;
 			try {
+				// 筛选Class类上带有@EventListener注解的方法
 				annotatedMethods = MethodIntrospector.selectMethods(targetType,
 						(MethodIntrospector.MetadataLookup<EventListener>) method ->
 								AnnotatedElementUtils.findMergedAnnotation(method, EventListener.class));
-			}
-			catch (Throwable ex) {
+			} catch (Throwable ex) {
 				// An unresolvable type in a method signature, probably from a lazy bean - let's ignore it.
 				if (logger.isDebugEnabled()) {
 					logger.debug("Could not resolve methods for bean with name '" + beanName + "'", ex);
 				}
 			}
 
+			// 不存在带有@EventListener注解方法
 			if (CollectionUtils.isEmpty(annotatedMethods)) {
+				// 添加到不存在注解的集合中
 				this.nonAnnotatedClasses.add(targetType);
 				if (logger.isTraceEnabled()) {
 					logger.trace("No @EventListener annotations found on bean class: " + targetType.getName());
 				}
-			}
-			else {
+			} else {
 				// Non-empty set of methods
 				ConfigurableApplicationContext context = this.applicationContext;
 				Assert.state(context != null, "No ApplicationContext set");
 				List<EventListenerFactory> factories = this.eventListenerFactories;
 				Assert.state(factories != null, "EventListenerFactory List not initialized");
+				// 遍历所有带有@EventListener注解的方法
 				for (Method method : annotatedMethods.keySet()) {
 					for (EventListenerFactory factory : factories) {
+						// 默认情况下是DefaultEventListenerFactory: true
 						if (factory.supportsMethod(method)) {
+							// 选择可用方法
 							Method methodToUse = AopUtils.selectInvocableMethod(method, context.getType(beanName));
+							// 根据方法创建ApplicationListener对象
 							ApplicationListener<?> applicationListener =
 									factory.createApplicationListener(beanName, targetType, methodToUse);
 							if (applicationListener instanceof ApplicationListenerMethodAdapter) {
@@ -198,6 +211,7 @@ public class EventListenerMethodProcessor
 	 * Determine whether the given class is an {@code org.springframework}
 	 * bean class that is not annotated as a user or test {@link Component}...
 	 * which indicates that there is no {@link EventListener} to be found there.
+	 *
 	 * @since 5.1
 	 */
 	private static boolean isSpringContainerClass(Class<?> clazz) {

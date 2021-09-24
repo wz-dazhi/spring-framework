@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group 'org.springframework'
+version '5.2.16.BUILD-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    optional(project(":spring-webmvc"))
+    optional("javax.servlet.jsp.jstl:javax.servlet.jsp.jstl-api")
+    testImplementation 'junit:junit:4.11'
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="/a" class="com.webmvc.test.handler.beanname.AController"/>
+	<bean id="/b" class="com.webmvc.test.handler.beanname.BHttpRequestHandler"/>
+	<bean id="/c" class="com.webmvc.test.handler.beanname.CServlet"/>
+	<bean id="/d" class="com.webmvc.test.handler.beanname.DControl"/>
+
+	<!-- 自带的Servlet Adapter -->
+	<bean class="org.springframework.web.servlet.handler.SimpleServletHandlerAdapter"/>
+	<!-- 自定义Adapter -->
+	<bean class="com.webmvc.test.handler.adpater.ControlHandlerAdapter"/>
+	<!-- springmvc 自带的adapter, 如果使用自定义的且没有使用<mvc:annotation-driver/>标签, 必须要把自带的加上 -->
+	<!--	<bean class="org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter"/>-->
+	<!--	<bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter"/>-->
+	<!--	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/>-->
+	<!--	<bean class="org.springframework.web.servlet.function.support.HandlerFunctionAdapter"/>-->
+
+</beans>

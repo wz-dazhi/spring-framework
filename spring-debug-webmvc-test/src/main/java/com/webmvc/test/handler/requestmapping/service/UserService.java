@@ -1,4 +1,4 @@
-package com.webmvc.test.simple.service;
+package com.webmvc.test.handler.requestmapping.service;
 
 import org.springframework.stereotype.Service;
 

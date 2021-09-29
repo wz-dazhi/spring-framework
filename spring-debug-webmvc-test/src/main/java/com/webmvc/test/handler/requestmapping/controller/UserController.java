@@ -1,4 +1,4 @@
-package com.webmvc.test.simple.controller;
+package com.webmvc.test.handler.requestmapping.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @projectName: spring
- * @package: com.webmvc.test.simple.controller
+ * @package: com.webmvc.test.handler.mapping.requestmapping.controller
  * @className: UserController
  * @description:
  * @author: zhi

@@ -7,5 +7,5 @@
 	   http://www.springframework.org/schema/context
 	   https://www.springframework.org/schema/context/spring-context.xsd">
 
-	<context:component-scan base-package="com.webmvc.test.handler.mapping.requestmapping.service"/>
+	<context:component-scan base-package="com.webmvc.test.handler.requestmapping.service"/>
 </beans>

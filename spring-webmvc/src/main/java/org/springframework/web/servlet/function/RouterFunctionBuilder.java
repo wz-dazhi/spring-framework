@@ -270,7 +270,9 @@ class RouterFunctionBuilder implements RouterFunctions.Builder {
 
 		@Override
 		public Optional<HandlerFunction<ServerResponse>> route(ServerRequest request) {
+			// 遍历所有的RouterFunction
 			for (RouterFunction<ServerResponse> routerFunction : this.routerFunctions) {
+				// route对应的HandlerFunction
 				Optional<HandlerFunction<ServerResponse>> result = routerFunction.route(request);
 				if (result.isPresent()) {
 					return result;

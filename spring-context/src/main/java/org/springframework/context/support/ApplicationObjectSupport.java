@@ -121,6 +121,7 @@ public abstract class ApplicationObjectSupport implements ApplicationContextAwar
 	 * @see #setApplicationContext
 	 */
 	protected void initApplicationContext(ApplicationContext context) throws BeansException {
+		// 调用子类模板方法. 初始化applicationContext, 进行初始化拦截器, 注册beanName带有 / 的handler
 		initApplicationContext();
 	}
 

@@ -109,19 +109,25 @@ public abstract class WebApplicationContextUtils {
 	@Nullable
 	public static WebApplicationContext getWebApplicationContext(ServletContext sc, String attrName) {
 		Assert.notNull(sc, "ServletContext must not be null");
+		// 从ServletContext attribute中获父级容器
 		Object attr = sc.getAttribute(attrName);
+		// 没有返回null
 		if (attr == null) {
 			return null;
 		}
+		// RuntimeException
 		if (attr instanceof RuntimeException) {
 			throw (RuntimeException) attr;
 		}
+		// Error
 		if (attr instanceof Error) {
 			throw (Error) attr;
 		}
+		// Exception
 		if (attr instanceof Exception) {
 			throw new IllegalStateException((Exception) attr);
 		}
+		// 不属于WebApplicationContext 抛出异常
 		if (!(attr instanceof WebApplicationContext)) {
 			throw new IllegalStateException("Context attribute is not of type WebApplicationContext: " + attr);
 		}

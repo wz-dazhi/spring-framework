@@ -149,13 +149,18 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	public final void init() throws ServletException {
 
 		// Set bean properties from init parameters.
+		// 从ServletConfig获取属性, 并设置到requiredProperties中
 		PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);
 		if (!pvs.isEmpty()) {
 			try {
+				// 把当前对象包装成BeanWrapper
 				BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(this);
 				ResourceLoader resourceLoader = new ServletContextResourceLoader(getServletContext());
+				// 注册自定义编辑器
 				bw.registerCustomEditor(Resource.class, new ResourceEditor(resourceLoader, getEnvironment()));
+				// 初始化BeanWrapper, 交由子类扩展
 				initBeanWrapper(bw);
+				// 设置requiredProperties
 				bw.setPropertyValues(pvs, true);
 			}
 			catch (BeansException ex) {
@@ -167,6 +172,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 		}
 
 		// Let subclasses do whatever initialization they like.
+		// 初始化Servlet Bean
 		initServletBean();
 	}
 
@@ -221,9 +227,11 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 			Set<String> missingProps = (!CollectionUtils.isEmpty(requiredProperties) ?
 					new HashSet<>(requiredProperties) : null);
 
+			// 获取初始化属性
 			Enumeration<String> paramNames = config.getInitParameterNames();
 			while (paramNames.hasMoreElements()) {
 				String property = paramNames.nextElement();
+				// 获取属性值
 				Object value = config.getInitParameter(property);
 				addPropertyValue(new PropertyValue(property, value));
 				if (missingProps != null) {

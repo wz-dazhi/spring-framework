@@ -121,8 +121,10 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 	@Override
 	@Nullable
 	protected Object getHandlerInternal(HttpServletRequest request) throws Exception {
+		// 根据请求获取uri
 		String lookupPath = getUrlPathHelper().getLookupPathForRequest(request);
 		request.setAttribute(LOOKUP_PATH, lookupPath);
+		// 获取handler
 		Object handler = lookupHandler(lookupPath, request);
 		if (handler == null) {
 			// We need to care for the default handler directly, since we need to
@@ -364,6 +366,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 				setDefaultHandler(resolvedHandler);
 			}
 			else {
+				// uri 设置对应的handler, 后期根据URI获取对应的handler
 				this.handlerMap.put(urlPath, resolvedHandler);
 				if (logger.isTraceEnabled()) {
 					logger.trace("Mapped [" + urlPath + "] onto " + getHandlerDescription(handler));

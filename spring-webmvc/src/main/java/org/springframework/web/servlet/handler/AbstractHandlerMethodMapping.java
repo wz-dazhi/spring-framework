@@ -100,6 +100,9 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	@Nullable
 	private HandlerMethodMappingNamingStrategy<T> namingStrategy;
 
+	/**
+	 * 映射注册器
+	 */
 	private final MappingRegistry mappingRegistry = new MappingRegistry();
 
 
@@ -202,6 +205,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 */
 	@Override
 	public void afterPropertiesSet() {
+		// 初始化handlerMethod
 		initHandlerMethods();
 	}
 
@@ -212,8 +216,10 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @see #handlerMethodsInitialized
 	 */
 	protected void initHandlerMethods() {
+		// 遍历所有的bean
 		for (String beanName : getCandidateBeanNames()) {
 			if (!beanName.startsWith(SCOPED_TARGET_NAME_PREFIX)) {
+				// 处理候选者bean
 				processCandidateBean(beanName);
 			}
 		}
@@ -254,7 +260,9 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				logger.trace("Could not resolve type for bean '" + beanName + "'", ex);
 			}
 		}
+		// class不等于空, 并且属于Handler @Controller @RequestMapping
 		if (beanType != null && isHandler(beanType)) {
+			// 探测Controller方法
 			detectHandlerMethods(beanName);
 		}
 	}
@@ -269,7 +277,9 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				obtainApplicationContext().getType((String) handler) : handler.getClass());
 
 		if (handlerType != null) {
+			// 获取用户的Class
 			Class<?> userType = ClassUtils.getUserClass(handlerType);
+			// 根据class过滤合适的映射方法
 			Map<Method, T> methods = MethodIntrospector.selectMethods(userType,
 					(MethodIntrospector.MetadataLookup<T>) method -> {
 						try {
@@ -283,6 +293,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			if (logger.isTraceEnabled()) {
 				logger.trace(formatMappings(userType, methods));
 			}
+			// 遍历方法, 将方法和映射list注册到HandlerMethod中
 			methods.forEach((method, mapping) -> {
 				Method invocableMethod = AopUtils.selectInvocableMethod(method, userType);
 				registerHandlerMethod(handler, invocableMethod, mapping);
@@ -361,14 +372,18 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	@Override
 	@Nullable
 	protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
+		// 根据request获取URI
 		String lookupPath = getUrlPathHelper().getLookupPathForRequest(request);
 		request.setAttribute(LOOKUP_PATH, lookupPath);
+		// 获取读锁
 		this.mappingRegistry.acquireReadLock();
 		try {
+			// 获取handler
 			HandlerMethod handlerMethod = lookupHandlerMethod(lookupPath, request);
 			return (handlerMethod != null ? handlerMethod.createWithResolvedBean() : null);
 		}
 		finally {
+			// 释放读锁
 			this.mappingRegistry.releaseReadLock();
 		}
 	}
@@ -385,18 +400,24 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	@Nullable
 	protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
 		List<Match> matches = new ArrayList<>();
+		// 根据URI获取映射list
 		List<T> directPathMatches = this.mappingRegistry.getMappingsByUrl(lookupPath);
 		if (directPathMatches != null) {
+			// 添加到匹配映射list中
 			addMatchingMappings(directPathMatches, matches, request);
 		}
+		// 没有映射到, 遍历所有的映射进行匹配
 		if (matches.isEmpty()) {
 			// No choice but to go through all mappings...
 			addMatchingMappings(this.mappingRegistry.getMappings().keySet(), matches, request);
 		}
 
 		if (!matches.isEmpty()) {
+			// 获取映射
 			Match bestMatch = matches.get(0);
+			// 如果映射多个, 将匹配出最接近的一个
 			if (matches.size() > 1) {
+				// 获取映射比较器
 				Comparator<Match> comparator = new MatchComparator(getMappingComparator(request));
 				matches.sort(comparator);
 				bestMatch = matches.get(0);
@@ -417,9 +438,11 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			}
 			request.setAttribute(BEST_MATCHING_HANDLER_ATTRIBUTE, bestMatch.handlerMethod);
 			handleMatch(bestMatch.mapping, lookupPath, request);
+			// 返回最符合条件的handler
 			return bestMatch.handlerMethod;
 		}
 		else {
+			// 没有匹配的映射
 			return handleNoMatch(this.mappingRegistry.getMappings().keySet(), lookupPath, request);
 		}
 	}

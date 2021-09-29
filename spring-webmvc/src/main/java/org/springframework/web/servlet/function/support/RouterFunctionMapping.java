@@ -120,9 +120,11 @@ public class RouterFunctionMapping extends AbstractHandlerMapping implements Ini
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		// 初始化routerFunction
 		if (this.routerFunction == null) {
 			initRouterFunction();
 		}
+		// 判断是设置了消息转换器, 如果没有进行初始化
 		if (CollectionUtils.isEmpty(this.messageConverters)) {
 			initMessageConverters();
 		}
@@ -135,15 +137,18 @@ public class RouterFunctionMapping extends AbstractHandlerMapping implements Ini
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	private void initRouterFunction() {
 		ApplicationContext applicationContext = obtainApplicationContext();
+		// 获取RouterFunction的子类
 		Map<String, RouterFunction> beans =
 				(this.detectHandlerFunctionsInAncestorContexts ?
 						BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, RouterFunction.class) :
 						applicationContext.getBeansOfType(RouterFunction.class));
 
+		// 打印日志
 		List<RouterFunction> routerFunctions = new ArrayList<>(beans.values());
 		if (!CollectionUtils.isEmpty(routerFunctions) && logger.isInfoEnabled()) {
 			routerFunctions.forEach(routerFunction -> logger.info("Mapped " + routerFunction));
 		}
+		// List<RouterFunction> 合并到RouterFunction中
 		this.routerFunction = routerFunctions.stream()
 				.reduce(RouterFunction::andOther)
 				.orElse(null);
@@ -171,11 +176,15 @@ public class RouterFunctionMapping extends AbstractHandlerMapping implements Ini
 	@Nullable
 	@Override
 	protected Object getHandlerInternal(HttpServletRequest servletRequest) throws Exception {
+		// 根据请求获取uri
 		String lookupPath = getUrlPathHelper().getLookupPathForRequest(servletRequest);
 		servletRequest.setAttribute(LOOKUP_PATH, lookupPath);
 		if (this.routerFunction != null) {
+			// 创建ServerRequest
 			ServerRequest request = ServerRequest.create(servletRequest, this.messageConverters);
+			// 将request设置到attribute中, 以便于判断状态
 			servletRequest.setAttribute(RouterFunctions.REQUEST_ATTRIBUTE, request);
+			// 路由
 			return this.routerFunction.route(request).orElse(null);
 		}
 		else {

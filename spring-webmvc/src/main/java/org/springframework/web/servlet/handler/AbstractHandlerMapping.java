@@ -284,7 +284,9 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	@Override
 	protected void initApplicationContext() throws BeansException {
 		extendInterceptors(this.interceptors);
+		// 探测MappedInterceptors
 		detectMappedInterceptors(this.adaptedInterceptors);
+		// 初始化拦截器
 		initInterceptors();
 	}
 
@@ -393,6 +395,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	@Override
 	@Nullable
 	public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
+		// 子类根据请求获取具体的handler
 		Object handler = getHandlerInternal(request);
 		if (handler == null) {
 			handler = getDefaultHandler();
@@ -401,11 +404,13 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			return null;
 		}
 		// Bean name or resolved handler?
+		// 如果handler属于字符串, 则根据字符串获取对应的bean
 		if (handler instanceof String) {
 			String handlerName = (String) handler;
 			handler = obtainApplicationContext().getBean(handlerName);
 		}
 
+		// 获取handler执行链
 		HandlerExecutionChain executionChain = getHandlerExecutionChain(handler, request);
 
 		if (logger.isTraceEnabled()) {
@@ -415,6 +420,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			logger.debug("Mapped to " + executionChain.getHandler());
 		}
 
+		// 是否属于跨域handler, 获取跨域配置, 将跨域配置设置到执行链中
 		if (hasCorsConfigurationSource(handler) || CorsUtils.isPreFlightRequest(request)) {
 			CorsConfiguration config = (this.corsConfigurationSource != null ? this.corsConfigurationSource.getCorsConfiguration(request) : null);
 			CorsConfiguration handlerConfig = getCorsConfiguration(handler, request);
@@ -465,10 +471,13 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 * @see #getAdaptedInterceptors()
 	 */
 	protected HandlerExecutionChain getHandlerExecutionChain(Object handler, HttpServletRequest request) {
+		// 包装成执行链
 		HandlerExecutionChain chain = (handler instanceof HandlerExecutionChain ?
 				(HandlerExecutionChain) handler : new HandlerExecutionChain(handler));
 
+		// 获取uri
 		String lookupPath = this.urlPathHelper.getLookupPathForRequest(request, LOOKUP_PATH);
+		// 遍历Interceptor, 根据uri进行过滤
 		for (HandlerInterceptor interceptor : this.adaptedInterceptors) {
 			if (interceptor instanceof MappedInterceptor) {
 				MappedInterceptor mappedInterceptor = (MappedInterceptor) interceptor;

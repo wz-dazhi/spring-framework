@@ -178,6 +178,7 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	@Override
 	@SuppressWarnings("deprecation")
 	public void afterPropertiesSet() {
+		// 初始化配置
 		this.config = new RequestMappingInfo.BuilderConfiguration();
 		this.config.setUrlPathHelper(getUrlPathHelper());
 		this.config.setPathMatcher(getPathMatcher());
@@ -186,6 +187,7 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 		this.config.setRegisteredSuffixPatternMatch(useRegisteredSuffixPatternMatch());
 		this.config.setContentNegotiationManager(getContentNegotiationManager());
 
+		// 出事HandlerMethod
 		super.afterPropertiesSet();
 	}
 
@@ -252,14 +254,19 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	@Override
 	@Nullable
 	protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
+		// 根据method创建RequestMappingInfo
 		RequestMappingInfo info = createRequestMappingInfo(method);
 		if (info != null) {
+			// 根据Class创建RequestMappingInfo
 			RequestMappingInfo typeInfo = createRequestMappingInfo(handlerType);
+			// 不等于空, Class Method进行合并
 			if (typeInfo != null) {
 				info = typeInfo.combine(info);
 			}
+			// 获取Class上@RequestMapping path前缀
 			String prefix = getPathPrefix(handlerType);
 			if (prefix != null) {
+				// 合并path
 				info = RequestMappingInfo.paths(prefix).options(this.config).build().combine(info);
 			}
 		}
@@ -336,6 +343,7 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	protected RequestMappingInfo createRequestMappingInfo(
 			RequestMapping requestMapping, @Nullable RequestCondition<?> customCondition) {
 
+		// 根据requestMapping构建RequestMappingInfo
 		RequestMappingInfo.Builder builder = RequestMappingInfo
 				.paths(resolveEmbeddedValuesInPatterns(requestMapping.path()))
 				.methods(requestMapping.method())

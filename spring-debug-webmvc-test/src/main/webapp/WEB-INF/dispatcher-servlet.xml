@@ -8,10 +8,10 @@
 	<!-- Servlet子容器 -->
 
 	<!-- RequestMapping测试 -->
-	<!--	<import resource="classpath:requestmapping/requestmapping-mvc.xml"/>-->
+	<import resource="classpath:requestmapping/requestmapping-mvc.xml"/>
 
 	<!-- RouterHandler测试 -->
-	<import resource="classpath:function/function-mvc.xml"/>
+	<!--	<import resource="classpath:function/function-mvc.xml"/>-->
 
 	<!-- beanName测试 -->
 	<!--	<import resource="classpath:beanname/beanname-mvc.xml"/>-->

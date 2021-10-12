@@ -78,9 +78,12 @@ public class ViewNameMethodReturnValueHandler implements HandlerMethodReturnValu
 	public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
 			ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
 
+		// 判断是否属于字符串
 		if (returnValue instanceof CharSequence) {
+			// 将视图名称放入容器
 			String viewName = returnValue.toString();
 			mavContainer.setViewName(viewName);
+			// 判断是否属于redirect
 			if (isRedirectViewName(viewName)) {
 				mavContainer.setRedirectModelScenario(true);
 			}

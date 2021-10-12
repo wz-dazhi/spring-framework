@@ -14,7 +14,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class AopTest {
 	public static void main(String[] args) {
-		System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
+		//System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
 		ApplicationContext c = new ClassPathXmlApplicationContext("aop/aop-jdk.xml");
 		final IUserService u = c.getBean(IUserService.class);
 		System.out.println(u);

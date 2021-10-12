@@ -16,6 +16,16 @@
 
 package org.springframework.aop.framework.autoproxy;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.aopalliance.aop.Advice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,15 +49,6 @@ import org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostP
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation
@@ -466,8 +467,17 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		proxyFactory.copyFrom(this);
 
 		// 是否直接代理目标类或接口, 默认为false
-		if (!proxyFactory.isProxyTargetClass()) {
-			// 是否跳过代理目标类
+		if (proxyFactory.isProxyTargetClass()) {
+			// Explicit handling of JDK proxy targets (for introduction advice scenarios)
+			if (Proxy.isProxyClass(beanClass)) {
+				// Must allow for introductions; can't just set interfaces to the proxy's interfaces only.
+				for (Class<?> ifc : beanClass.getInterfaces()) {
+					proxyFactory.addInterface(ifc);
+				}
+			}
+		}
+		else {
+			// No proxyTargetClass flag enforced, let's apply our default checks...
 			if (shouldProxyTargetClass(beanClass, beanName)) {
 				// 直接代理目标类
 				proxyFactory.setProxyTargetClass(true);

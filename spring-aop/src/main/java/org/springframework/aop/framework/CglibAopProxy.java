@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2020 the original author or authors.
+ * Copyright 2002-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -251,7 +251,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 	 * validates it if not.
 	 */
 	private void validateClassIfNecessary(Class<?> proxySuperClass, @Nullable ClassLoader proxyClassLoader) {
-		if (logger.isWarnEnabled()) {
+		if (logger.isInfoEnabled()) {
 			synchronized (validatedClasses) {
 				// 是否已经校验过了, 没有校验过, 进行校验, 然后加入缓存中. 避免重复校验
 				if (!validatedClasses.containsKey(proxySuperClass)) {
@@ -716,13 +716,19 @@ class CglibAopProxy implements AopProxy, Serializable {
 				// Check whether we only have one InvokerInterceptor: that is,
 				// no real advice, but just reflective invocation of the target.
 				// 拦截器链空的, 并且方法属于public
-				if (chain.isEmpty() && Modifier.isPublic(method.getModifiers())) {
+				if (chain.isEmpty() && CglibMethodInvocation.isMethodProxyCompatible(method)) {
 					// We can skip creating a MethodInvocation: just invoke the target directly.
 					// Note that the final invoker must be an InvokerInterceptor, so we know
 					// it does nothing but a reflective operation on the target, and no hot
 					// swapping or fancy proxying.
 					Object[] argsToUse = AopProxyUtils.adaptArgumentsIfNecessary(method, args);
-					retVal = methodProxy.invoke(target, argsToUse);
+					try {
+						retVal = methodProxy.invoke(target, argsToUse);
+					}
+					catch (CodeGenerationException ex) {
+						CglibMethodInvocation.logFastClassGenerationFailure(method);
+						retVal = AopUtils.invokeJoinpointUsingReflection(target, method, argsToUse);
+					}
 				}
 				else {
 					// We need to create a method invocation...
@@ -776,10 +782,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 			super(proxy, target, method, arguments, targetClass, interceptorsAndDynamicMethodMatchers);
 
 			// Only use method proxy for public methods not derived from java.lang.Object
-			this.methodProxy = (Modifier.isPublic(method.getModifiers()) &&
-					method.getDeclaringClass() != Object.class && !AopUtils.isEqualsMethod(method) &&
-					!AopUtils.isHashCodeMethod(method) && !AopUtils.isToStringMethod(method) ?
-					methodProxy : null);
+			this.methodProxy = (isMethodProxyCompatible(method) ? methodProxy : null);
 		}
 
 		@Override
@@ -815,10 +818,25 @@ class CglibAopProxy implements AopProxy, Serializable {
 		@Override
 		protected Object invokeJoinpoint() throws Throwable {
 			if (this.methodProxy != null) {
-				return this.methodProxy.invoke(this.target, this.arguments);
+				try {
+					return this.methodProxy.invoke(this.target, this.arguments);
+				}
+				catch (CodeGenerationException ex) {
+					logFastClassGenerationFailure(this.method);
+				}
 			}
-			else {
-				return super.invokeJoinpoint();
+			return super.invokeJoinpoint();
+		}
+
+		static boolean isMethodProxyCompatible(Method method) {
+			return (Modifier.isPublic(method.getModifiers()) &&
+					method.getDeclaringClass() != Object.class && !AopUtils.isEqualsMethod(method) &&
+					!AopUtils.isHashCodeMethod(method) && !AopUtils.isToStringMethod(method));
+		}
+
+		static void logFastClassGenerationFailure(Method method) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Failed to generate CGLIB fast class for method: " + method);
 			}
 		}
 	}

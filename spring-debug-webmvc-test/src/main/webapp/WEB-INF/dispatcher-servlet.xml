@@ -14,7 +14,7 @@
 	<!--	<import resource="classpath:function/function-mvc.xml"/>-->
 
 	<!-- beanName测试 -->
-	<!--	<import resource="classpath:beanname/beanname-mvc.xml"/>-->
+	<!--		<import resource="classpath:beanname/beanname-mvc.xml"/>-->
 
 
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">

@@ -12,11 +12,12 @@ repositories {
 
 dependencies {
     compile(project(':spring-context'))
+    compile(project(':spring-jdbc'))
     optional('org.codehaus.groovy:groovy')
     optional("com.fasterxml.jackson.core:jackson-databind")
     optional("org.yaml:snakeyaml")
     optional("org.aspectj:aspectjweaver")
-    implementation 'org.projectlombok:lombok:1.18.8'
+    implementation 'mysql:mysql-connector-java:8.0.27'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 }

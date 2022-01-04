@@ -182,7 +182,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 						parseDefaultElement(ele, delegate);
 					}
 					else {
-						// 解析自定义扩展的标签; 比如: <context:  <aop:  <cache:   包括我们自定义扩展的各种标签
+						// 解析自定义扩展的标签; 比如: <context:  <aop:  <cache: <tx:  包括我们自定义扩展的各种标签
 						delegate.parseCustomElement(ele);
 					}
 				}

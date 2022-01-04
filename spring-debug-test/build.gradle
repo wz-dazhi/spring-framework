@@ -11,6 +11,10 @@ repositories {
 }
 
 dependencies {
+    compile(project(":spring-aop"))
+    compile(project(":spring-beans"))
+    compile(project(":spring-core"))
+    compile(project(":spring-expression"))
     compile(project(':spring-context'))
     compile(project(':spring-jdbc'))
     optional('org.codehaus.groovy:groovy')

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2020 the original author or authors.
+ * Copyright 2002-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,13 +51,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
 
 /**
  * A component provider that provides candidate components from a base package. Can
@@ -92,9 +94,9 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 
 	private String resourcePattern = DEFAULT_RESOURCE_PATTERN;
 
-	private final List<TypeFilter> includeFilters = new LinkedList<>();
+	private final List<TypeFilter> includeFilters = new ArrayList<>();
 
-	private final List<TypeFilter> excludeFilters = new LinkedList<>();
+	private final List<TypeFilter> excludeFilters = new ArrayList<>();
 
 	@Nullable
 	private Environment environment;
@@ -458,8 +460,11 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 								logger.trace("Ignored because not matching any filter: " + resource);
 							}
 						}
-					}
-					catch (Throwable ex) {
+					} catch (FileNotFoundException ex) {
+						if (traceEnabled) {
+							logger.trace("Ignored non-readable " + resource + ": " + ex.getMessage());
+						}
+					} catch (Throwable ex) {
 						throw new BeanDefinitionStoreException(
 								"Failed to read candidate component class: " + resource, ex);
 					}

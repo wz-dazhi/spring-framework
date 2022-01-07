@@ -22,7 +22,10 @@ public class TxTest {
 	private static final Random RANDOM = new Random();
 
 	public static void main(String[] args) {
-		ApplicationContext ac = new ClassPathXmlApplicationContext("xml/tx.xml");
+		// xml 事物
+		//ApplicationContext ac = new ClassPathXmlApplicationContext("xml/tx.xml");
+		// annotation 事物
+		ApplicationContext ac = new ClassPathXmlApplicationContext("xml/tx-annotation.xml");
 		UserService userService = ac.getBean(UserService.class);
 		List<User> users = userService.getAll();
 		users.forEach(System.out::println);

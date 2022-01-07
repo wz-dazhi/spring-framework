@@ -2,6 +2,8 @@ package com.springframework.test.xml.tx;
 
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,6 +16,7 @@ import java.util.List;
  * @date: 2021/12/28
  * @version: 1.0
  */
+@Service
 public class UserServiceImpl implements UserService {
 	private final JdbcTemplate jdbcTemplate;
 
@@ -26,6 +29,7 @@ public class UserServiceImpl implements UserService {
 		return jdbcTemplate.queryForObject("SELECT * FROM t_user where id = ?", new BeanPropertyRowMapper<>(User.class), id);
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public int add(User u) {
 		return jdbcTemplate.update("insert into t_user(user_no, username, password, create_time, update_time) VALUES (?, ?, ?, ?, ?)",

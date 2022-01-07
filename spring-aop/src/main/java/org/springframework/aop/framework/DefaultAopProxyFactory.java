@@ -50,6 +50,7 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 
 	@Override
 	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
+		// config: xml或注解对于AOP的相关配置<aop:aspectj-autoproxy
 		// 需要优化 || 直接代理目标对象 || (没有代理接口 或者 只有一个SpringProxy一个接口)
 		if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) {
 			// 获取目标class

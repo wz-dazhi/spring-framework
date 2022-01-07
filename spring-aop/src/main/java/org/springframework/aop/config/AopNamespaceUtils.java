@@ -86,12 +86,12 @@ public abstract class AopNamespaceUtils {
 
 	private static void useClassProxyingIfNecessary(BeanDefinitionRegistry registry, @Nullable Element sourceElement) {
 		if (sourceElement != null) {
-			// 设置proxy-target-class属性
+			// 设置proxy-target-class属性, 如果设置为true, 直接代理目标class
 			boolean proxyTargetClass = Boolean.parseBoolean(sourceElement.getAttribute(PROXY_TARGET_CLASS_ATTRIBUTE));
 			if (proxyTargetClass) {
 				AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);
 			}
-			// 设置expose-proxy属性
+			// 设置expose-proxy属性. 如果为true, 将代理对象暴露到ThreadLocal中, 可以使用AopContext.currentProxy() 拿到当前代理对象
 			boolean exposeProxy = Boolean.parseBoolean(sourceElement.getAttribute(EXPOSE_PROXY_ATTRIBUTE));
 			if (exposeProxy) {
 				AopConfigUtils.forceAutoProxyCreatorToExposeProxy(registry);

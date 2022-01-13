@@ -290,7 +290,7 @@ public abstract class AopUtils {
 		if (advisor instanceof IntroductionAdvisor) {
 			return ((IntroductionAdvisor) advisor).getClassFilter().matches(targetClass);
 		}
-		// PointcutAdvisor属于匹配到Method上
+		// PointcutAdvisor属于匹配到Method上, 比如: BeanFactoryTransactionAttributeSourceAdvisor(处理@Transactional注解)
 		else if (advisor instanceof PointcutAdvisor) {
 			PointcutAdvisor pca = (PointcutAdvisor) advisor;
 			return canApply(pca.getPointcut(), targetClass, hasIntroductions);
@@ -330,6 +330,7 @@ public abstract class AopUtils {
 				// already processed
 				continue;
 			}
+			// 判断clazz是否可以匹配到对应的Advisor
 			if (canApply(candidate, clazz, hasIntroductions)) {
 				eligibleAdvisors.add(candidate);
 			}

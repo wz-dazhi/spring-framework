@@ -45,7 +45,17 @@ public class TxTest {
 		StringBuilder random = new StringBuilder();
 		for (int i = 0; i < 10; i++) {
 			random.append(CHARS[RANDOM.nextInt(CHARS.length)]);
+			if (RANDOM.nextInt(10) % 2 == 0) {
+				random.append(toUpperCase(CHARS[RANDOM.nextInt(CHARS.length)]));
+			}
 		}
 		return random.toString();
+	}
+
+	private static char toUpperCase(char c) {
+		if (97 <= c && c <= 127) {
+			c ^= 32;
+		}
+		return c;
 	}
 }

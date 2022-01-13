@@ -1192,7 +1192,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			return obtainFromSupplier(instanceSupplier, beanName);
 		}
 
-		// 使用factory-method的方式创建bean
+		// 使用factory-method的方式创建bean  或者 使用@Bean的方式(@Bean的方式也会使用这种, 具体操作在ConfigurationClassBeanDefinitionReader.loadBeanDefinitionsForBeanMethod())
 		if (mbd.getFactoryMethodName() != null) {
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}

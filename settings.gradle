@@ -38,4 +38,5 @@ rootProject.children.each {project ->
 }
 include 'spring-debug-test'
 include 'spring-debug-webmvc-test'
+include 'spring-debug-webflux-test'
 

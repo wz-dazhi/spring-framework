@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+}
+
+group 'org.springframework'
+version '5.2.20.BUILD-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile(project(':spring-context'))
+    compile(project(':spring-webflux'))
+    optional("io.projectreactor.netty:reactor-netty")
+    optional("com.fasterxml.jackson.core:jackson-databind")
+}
+
+test {
+    useJUnitPlatform()
+}

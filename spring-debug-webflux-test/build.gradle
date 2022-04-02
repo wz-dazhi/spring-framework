@@ -2,9 +2,6 @@ plugins {
     id 'java'
 }
 
-group 'org.springframework'
-version '5.2.20.BUILD-SNAPSHOT'
-
 repositories {
     mavenCentral()
 }

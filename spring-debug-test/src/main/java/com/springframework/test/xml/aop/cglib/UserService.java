@@ -12,7 +12,8 @@ package com.springframework.test.xml.aop.cglib;
 public class UserService {
 
 	public void show(String name) {
-		System.out.println("-----UserService show()--------------" + name);
+		throw new RuntimeException("aa");
+		//System.out.println("-----UserService show()--------------" + name);
 	}
 
 	public void show2(String name) {

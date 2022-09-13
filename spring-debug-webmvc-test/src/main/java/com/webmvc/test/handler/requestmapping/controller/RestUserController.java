@@ -3,6 +3,7 @@ package com.webmvc.test.handler.requestmapping.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webmvc.test.handler.requestmapping.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,8 +24,12 @@ public class RestUserController {
 	@Autowired
 	private UserService userService;
 
-	@GetMapping
+	/**
+	 * 由于使用自定义Tomcat 包, 可能出现乱码问题. 加上 MediaType.APPLICATION_JSON_VALUE
+	 */
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public String getName(@RequestParam String name) {
+		System.out.println(name);
 		return userService.getName(name);
 	}
 

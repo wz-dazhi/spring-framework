@@ -13,7 +13,7 @@ dependencies {
     optional("javax.servlet:javax.servlet-api")
     optional("javax.servlet.jsp.jstl:javax.servlet.jsp.jstl-api")
     optional("com.fasterxml.jackson.core:jackson-databind")
-    testImplementation 'junit:junit:4.11'
+    testImplementation 'junit:junit:4.13.2'
 }
 
 test {

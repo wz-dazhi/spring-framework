@@ -32,35 +32,35 @@ public class LogAspect {
 		final Object aThis = mi.getThis();
 		// 在before中不用手动调用mi.proceed(), 手动调用会打乱执行链路顺序, 因为在调用当前方法后, aop执行链路中会自动调用
 //			mi.proceed();
-		System.out.println("--------before---------------mi: " + mi);
+		System.out.println("--------before---------------mi: " + mi + ", JoinPoint: " + jp.getClass());
 	}
 
 //	@After("pointcut()")
 	public void after(JoinPoint jp) {
-		System.out.println("--------after---------------jp: " + jp);
+		System.out.println("--------after---------------jp: " + jp + ", JoinPoint: " + jp.getClass());
 	}
 
 //	@AfterReturning("pointcut()")
 	public void afterReturning(JoinPoint jp, Object resultObj) {
 		final Signature signature = jp.getSignature();
-		System.out.println("--------afterReturning---------------jp: " + jp + ", resultObj: " + resultObj);
+		System.out.println("--------afterReturning---------------jp: " + jp + ", resultObj: " + resultObj + ", JoinPoint: " + jp.getClass());
 	}
 
 //	@AfterThrowing("pointcut()")
 	public void afterThrowing(JoinPoint jp, Throwable t) {
-		System.out.println("--------afterThrowing---------------jp: " + jp + ", t: " + t);
+		System.out.println("--------afterThrowing---------------jp: " + jp + ", t: " + t + ", JoinPoint: " + jp.getClass());
 	}
 
 //	@Around("pointcut()")
 	public Object around(ProceedingJoinPoint pjp) throws Throwable {
-		System.out.println("--------around-----start----------pjp: " + pjp);
+		System.out.println("--------around-----start----------pjp: " + pjp + ", JoinPoint: " + pjp.getClass());
 		MethodInvocationProceedingJoinPoint mi = (MethodInvocationProceedingJoinPoint) pjp;
 		final Object[] args = mi.getArgs();
 		final Signature signature = mi.getSignature();
 		final Object target = mi.getTarget();
 		final Object aThis = mi.getThis();
 		final Object result = mi.proceed();
-		System.out.println("--------around-----end----------pjp: " + pjp);
+		System.out.println("--------around-----end----------pjp: " + pjp + ", JoinPoint: " + pjp.getClass());
 		return result;
 	}
 

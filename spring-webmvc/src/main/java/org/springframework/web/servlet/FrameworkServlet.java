@@ -670,7 +670,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
 		wac.setEnvironment(getEnvironment());
 		wac.setParent(parent);
-		// 获取配置文件路径, 默认/WEB-INF/applicationContext.xml; 可以通过初始化参数进行设置
+		// 获取配置文件路径, springmvc子容器默认/WEB-INF/<servlet-name>-servlet.xml, 不设置会判断namespace; 可以通过初始化参数进行设置
 		String configLocation = getContextConfigLocation();
 		if (configLocation != null) {
 			wac.setConfigLocation(configLocation);
@@ -710,6 +710,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
 		postProcessWebApplicationContext(wac);
 		applyInitializers(wac);
+		// 子容器刷新
 		wac.refresh();
 	}
 

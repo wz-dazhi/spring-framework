@@ -128,6 +128,7 @@ class ConfigurationClassBeanDefinitionReader {
 	private void loadBeanDefinitionsForConfigurationClass(
 			ConfigurationClass configClass, TrackedConditionEvaluator trackedConditionEvaluator) {
 
+		// 判断是否需要跳过该配置类, 根据Condition注解判断
 		if (trackedConditionEvaluator.shouldSkip(configClass)) {
 			String beanName = configClass.getBeanName();
 			if (StringUtils.hasLength(beanName) && this.registry.containsBeanDefinition(beanName)) {
@@ -137,10 +138,14 @@ class ConfigurationClassBeanDefinitionReader {
 			return;
 		}
 
+		// 判断是否已经被其他配置类进行了导入
 		if (configClass.isImported()) {
+			// 注册已经导入的bean
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
 		}
+		// 遍历@Bean 的方法
 		for (BeanMethod beanMethod : configClass.getBeanMethods()) {
+			// 加载bean
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
 
@@ -181,14 +186,17 @@ class ConfigurationClassBeanDefinitionReader {
 		String methodName = metadata.getMethodName();
 
 		// Do we need to mark the bean as skipped by its condition?
+		// 标记被Condition条件过滤掉的bean, 返回true表示跳过
 		if (this.conditionEvaluator.shouldSkip(metadata, ConfigurationPhase.REGISTER_BEAN)) {
 			configClass.skippedBeanMethods.add(methodName);
 			return;
 		}
+		// 存在跳过的集合中, 直接返回
 		if (configClass.skippedBeanMethods.contains(methodName)) {
 			return;
 		}
 
+		// 获取@Bean注解. @Bean的实现方式为给当前Bean设置一个 FactoryMethodName, 实例化过程中调用工厂名称
 		AnnotationAttributes bean = AnnotationConfigUtils.attributesFor(metadata, Bean.class);
 		Assert.state(bean != null, "No @Bean annotation attributes");
 
@@ -211,6 +219,7 @@ class ConfigurationClassBeanDefinitionReader {
 			return;
 		}
 
+		// 开始创建BeanDefinition, 注入到容器
 		ConfigurationClassBeanDefinition beanDef = new ConfigurationClassBeanDefinition(configClass, metadata, beanName);
 		beanDef.setSource(this.sourceExtractor.extractSource(metadata, configClass.getResource()));
 

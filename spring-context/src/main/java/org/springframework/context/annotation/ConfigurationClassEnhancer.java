@@ -118,6 +118,7 @@ class ConfigurationClassEnhancer {
 	 * Creates a new CGLIB {@link Enhancer} instance.
 	 */
 	private Enhancer newEnhancer(Class<?> configSuperClass, @Nullable ClassLoader classLoader) {
+		// 创建Enhancer对象, 设置拦截器 BeanMethodInterceptor. 该拦截器会从BeanFactory中获取
 		Enhancer enhancer = new Enhancer();
 		enhancer.setSuperclass(configSuperClass);
 		enhancer.setInterfaces(new Class<?>[] {EnhancedConfiguration.class});
@@ -284,6 +285,8 @@ class ConfigurationClassEnhancer {
 		public Object intercept(Object enhancedConfigInstance, Method beanMethod, Object[] beanMethodArgs,
 					MethodProxy cglibMethodProxy) throws Throwable {
 
+			// 获取@Configuration class的代理对象(如果proxyBeanMethods = true的话, 默认是true), 从对象中获取BeanFactory.
+			// 然后根据beanFactory获取bean对象, 避免配置多个相同的bean
 			ConfigurableBeanFactory beanFactory = getBeanFactory(enhancedConfigInstance);
 			String beanName = BeanAnnotationHelper.determineBeanNameFor(beanMethod);
 
@@ -358,6 +361,7 @@ class ConfigurationClassEnhancer {
 						}
 					}
 				}
+				// 从工厂中获取实例
 				Object beanInstance = (useArgs ? beanFactory.getBean(beanName, beanMethodArgs) :
 						beanFactory.getBean(beanName));
 				if (!ClassUtils.isAssignableValue(beanMethod.getReturnType(), beanInstance)) {

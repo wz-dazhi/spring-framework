@@ -121,6 +121,7 @@ class RequestResponseBodyAdviceChain implements RequestBodyAdvice, ResponseBodyA
 	public Object handleEmptyBody(@Nullable Object body, HttpInputMessage inputMessage, MethodParameter parameter,
 			Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
 
+		// 匹配RequestBodyAdvice的实现类
 		for (RequestBodyAdvice advice : getMatchingAdvice(parameter, RequestBodyAdvice.class)) {
 			if (advice.supports(parameter, targetType, converterType)) {
 				body = advice.handleEmptyBody(body, inputMessage, parameter, targetType, converterType);
@@ -136,8 +137,11 @@ class RequestResponseBodyAdviceChain implements RequestBodyAdvice, ResponseBodyA
 			Class<? extends HttpMessageConverter<?>> converterType,
 			ServerHttpRequest request, ServerHttpResponse response) {
 
+		// 匹配ResponseBodyAdvice的实现类
 		for (ResponseBodyAdvice<?> advice : getMatchingAdvice(returnType, ResponseBodyAdvice.class)) {
+			// 判断是否支持
 			if (advice.supports(returnType, converterType)) {
+				// 调用ResponseBodyAdvice 的beforeBodyWrite方法
 				body = ((ResponseBodyAdvice<T>) advice).beforeBodyWrite((T) body, returnType,
 						contentType, converterType, request, response);
 			}
@@ -147,6 +151,7 @@ class RequestResponseBodyAdviceChain implements RequestBodyAdvice, ResponseBodyA
 
 	@SuppressWarnings("unchecked")
 	private <A> List<A> getMatchingAdvice(MethodParameter parameter, Class<? extends A> adviceType) {
+		// 根据class类型获取advice 列表, adviceType: RequestBodyAdvice, ResponseBodyAdvice
 		List<Object> availableAdvice = getAdvice(adviceType);
 		if (CollectionUtils.isEmpty(availableAdvice)) {
 			return Collections.emptyList();

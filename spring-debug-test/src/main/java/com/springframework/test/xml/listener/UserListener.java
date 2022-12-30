@@ -17,6 +17,6 @@ public class UserListener {
 
 	@EventListener
 	public void createdUser(UserEvent event) {
-		System.out.println(event);
+		System.out.println(Thread.currentThread().getName() + "--" + event);
 	}
 }

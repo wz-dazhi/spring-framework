@@ -21,6 +21,6 @@ public class AsyncUserListener {
 	@Async
 	@EventListener
 	public void createdUser(UserEvent event) {
-		System.out.println("Async -> " + event);
+		System.out.println(Thread.currentThread().getName() + "-- Async -> " + event);
 	}
 }

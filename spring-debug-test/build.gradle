@@ -18,7 +18,10 @@ dependencies {
     optional("com.fasterxml.jackson.core:jackson-databind")
     optional("org.yaml:snakeyaml")
     optional("org.aspectj:aspectjweaver")
-    implementation 'mysql:mysql-connector-java:8.0.27'
+    optional("ch.qos.logback:logback-classic:1.2.7")
+    optional("org.apache.logging.log4j:log4j-to-slf4j:2.13.3")
+    optional("org.slf4j:jul-to-slf4j:1.7.32")
+    implementation 'mysql:mysql-connector-java:8.0.28'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 }

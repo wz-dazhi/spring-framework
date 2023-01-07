@@ -116,7 +116,7 @@ public class AsyncExecutionInterceptor extends AsyncExecutionAspectSupport imple
 		// 定义Callable接口
 		Callable<Object> task = () -> {
 			try {
-				// 回到执行器链上ReflectiveMethodInvocation, 开始调用具体的监听器方法
+				// 回到执行器链上ReflectiveMethodInvocation, 开始调用具体的方法
 				Object result = invocation.proceed();
 				if (result instanceof Future) {
 					return ((Future<?>) result).get();
@@ -131,6 +131,7 @@ public class AsyncExecutionInterceptor extends AsyncExecutionAspectSupport imple
 			return null;
 		};
 
+		// 提交任务
 		return doSubmit(task, executor, invocation.getMethod().getReturnType());
 	}
 
@@ -159,7 +160,9 @@ public class AsyncExecutionInterceptor extends AsyncExecutionAspectSupport imple
 	@Override
 	@Nullable
 	protected Executor getDefaultExecutor(@Nullable BeanFactory beanFactory) {
+		// 从容器中获取Executor执行器
 		Executor defaultExecutor = super.getDefaultExecutor(beanFactory);
+		// 获取不到, new SimpleAsyncTaskExecutor()
 		return (defaultExecutor != null ? defaultExecutor : new SimpleAsyncTaskExecutor());
 	}
 

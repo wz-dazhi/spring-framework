@@ -214,6 +214,7 @@ public class ServiceLocatorFactoryBean implements FactoryBean<Object>, BeanFacto
 	 * information on the semantics of such methods.
 	 */
 	public void setServiceLocatorInterface(Class<?> interfaceType) {
+		// 工厂接口
 		this.serviceLocatorInterface = interfaceType;
 	}
 
@@ -263,7 +264,7 @@ public class ServiceLocatorFactoryBean implements FactoryBean<Object>, BeanFacto
 			throw new IllegalArgumentException("Property 'serviceLocatorInterface' is required");
 		}
 
-		// Create service locator proxy.
+		// Create service locator proxy. 创建代理对象
 		this.proxy = Proxy.newProxyInstance(
 				this.serviceLocatorInterface.getClassLoader(),
 				new Class<?>[] {this.serviceLocatorInterface},
@@ -331,11 +332,13 @@ public class ServiceLocatorFactoryBean implements FactoryBean<Object>, BeanFacto
 	@Override
 	@Nullable
 	public Object getObject() {
+		// 返回代理对象 ServiceLocatorInvocationHandler
 		return this.proxy;
 	}
 
 	@Override
 	public Class<?> getObjectType() {
+		// 返回工厂接口Class
 		return this.serviceLocatorInterface;
 	}
 
@@ -352,6 +355,7 @@ public class ServiceLocatorFactoryBean implements FactoryBean<Object>, BeanFacto
 
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			// 判断 equals hashCode toString 方法
 			if (ReflectionUtils.isEqualsMethod(method)) {
 				// Only consider equal when proxies are identical.
 				return (proxy == args[0]);
@@ -364,20 +368,25 @@ public class ServiceLocatorFactoryBean implements FactoryBean<Object>, BeanFacto
 				return "Service locator: " + serviceLocatorInterface;
 			}
 			else {
+				// 根据接口方法和参数获取对应的实现类
 				return invokeServiceLocatorMethod(method, args);
 			}
 		}
 
 		private Object invokeServiceLocatorMethod(Method method, Object[] args) throws Exception {
+			// 获取返回值Class
 			Class<?> serviceLocatorMethodReturnType = getServiceLocatorMethodReturnType(method);
 			try {
+				// 根据传入的参数获取beanName
 				String beanName = tryGetBeanName(args);
 				Assert.state(beanFactory != null, "No BeanFactory available");
+				// 根据beanName获取
 				if (StringUtils.hasLength(beanName)) {
 					// Service locator for a specific bean name
 					return beanFactory.getBean(beanName, serviceLocatorMethodReturnType);
 				}
 				else {
+					// 直接根据类型获取, 如果有多个实现类的情况下, 会报错
 					// Service locator for a bean type
 					return beanFactory.getBean(serviceLocatorMethodReturnType);
 				}

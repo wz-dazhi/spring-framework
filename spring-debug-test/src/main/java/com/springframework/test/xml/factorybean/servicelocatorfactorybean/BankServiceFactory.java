@@ -1,4 +1,4 @@
-package com.springframework.test.xml.factorybean;
+package com.springframework.test.xml.factorybean.servicelocatorfactorybean;
 
 /**
  * @projectName: spring-framework
@@ -11,6 +11,14 @@ package com.springframework.test.xml.factorybean;
  */
 public interface BankServiceFactory {
 
-	BankService getBankService(String type);
+	/**
+	 * 字符串获取
+	 */
+	//BankService getBankService(String type);
+
+	/**
+	 * 枚举获取
+	 */
+	BankService getBankService(BankType type);
 
 }

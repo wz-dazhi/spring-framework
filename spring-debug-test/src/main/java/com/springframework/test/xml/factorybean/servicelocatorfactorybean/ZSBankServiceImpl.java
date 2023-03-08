@@ -1,4 +1,4 @@
-package com.springframework.test.xml.factorybean;
+package com.springframework.test.xml.factorybean.servicelocatorfactorybean;
 
 import org.springframework.stereotype.Service;
 

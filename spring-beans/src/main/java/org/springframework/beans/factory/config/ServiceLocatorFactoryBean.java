@@ -405,6 +405,7 @@ public class ServiceLocatorFactoryBean implements FactoryBean<Object>, BeanFacto
 		private String tryGetBeanName(@Nullable Object[] args) {
 			String beanName = "";
 			if (args != null && args.length == 1 && args[0] != null) {
+				// 使用参数的toString()方法, 这里我们可以使用枚举的方式,但是需要重新枚举的toString()方法,  toString需要返回bean的名称
 				beanName = args[0].toString();
 			}
 			// Look for explicit serviceId-to-beanName mappings.

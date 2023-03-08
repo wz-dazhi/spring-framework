@@ -1,4 +1,4 @@
-package com.springframework.test.xml.factorybean;
+package com.springframework.test.xml.factorybean.servicelocatorfactorybean;
 
 /**
  * @projectName: spring-framework
@@ -14,6 +14,10 @@ public enum BankType {
 	GS(BankType.G_S, "工商"),
 
 	;
+
+	public static final String Z_S = "zhao.shang";
+
+	public static final String G_S = "gong.shang";
 
 	private final String type;
 	private final String desc;
@@ -32,7 +36,9 @@ public enum BankType {
 		return desc;
 	}
 
-	public static final String Z_S = "zhao.shang";
-	public static final String G_S = "gong.shang";
+	@Override
+	public String toString() {
+		return this.type;
+	}
 
 }

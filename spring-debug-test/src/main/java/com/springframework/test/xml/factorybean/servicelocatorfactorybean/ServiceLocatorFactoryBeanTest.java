@@ -1,4 +1,4 @@
-package com.springframework.test.xml.factorybean;
+package com.springframework.test.xml.factorybean.servicelocatorfactorybean;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
@@ -7,7 +7,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.AbstractApplicationContext;
 
 /**
  * @projectName: spring-framework
@@ -46,12 +45,19 @@ public class ServiceLocatorFactoryBeanTest {
 	public static void main(String[] args) {
 		ApplicationContext ac = new AnnotationConfigApplicationContext(ServiceLocatorFactoryBeanTest.class);
 		BankServiceFactory f = ac.getBean(BankServiceFactory.class);
-		// ServiceLocatorInvocationHandler 调用invoke方法, 从BeanFactory中根据beanName获取
-		System.out.println(f.getBankService(BankType.Z_S).pay());
-		System.out.println(f.getBankService(BankType.G_S).pay());
 
-		// 获取一个不存在的实现类
-		f.getBankService("hello").pay();
+		// 使用字符串的方式获取
+		// ServiceLocatorInvocationHandler 调用invoke方法, 从BeanFactory中根据beanName获取
+//		System.out.println(f.getBankService(BankType.Z_S).pay());
+//		System.out.println(f.getBankService(BankType.G_S).pay());
+//
+//		// 获取一个不存在的实现类
+//		f.getBankService("hello").pay();
+
+
+		// 使用枚举获取, 会调用枚举的toString()方法获取. 所以需要重写枚举toString
+		System.out.println(f.getBankService(BankType.ZS).pay());
+		System.out.println(f.getBankService(BankType.GS).pay());
 	}
 
 }
